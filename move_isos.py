@@ -4,6 +4,9 @@ from time import sleep
 import threading
 from filecmp import cmp
 
+#1 will remove the source file after copy, 0 will copy and keep the source iso
+move = 1
+
 
 total_games = 0
 ignored_games = 0
@@ -73,7 +76,6 @@ for root, dirs, files in os.walk(dir):
                             print("[IGNORED] matching iso file already exists in", newgamefile)
                             copy_ = False
                     else:
-                        print("GameID: "+ gameid + "\nDisc: "+ str(disc_number))
                         print("There's already an iso at", newgamefile,"since destination and source don't match, the destination iso is being replaced.")
 
                         try:
@@ -83,8 +85,17 @@ for root, dirs, files in os.walk(dir):
                             print("Can't delete the file, this iso is being ignored, error:",e)
                             copy_ = False
                 if copy_ == True:
+                    print("GameID: "+ gameid + "\nDisc: "+ str(disc_number))
+                    print("Matched name (wiitdb):", gamename)
                     print("Copying game...")
                     copyfile(pathfile, newgamefile)
+                    #test if files match#
+                    if move == 1:
+                        if cmp(pathfile, newgamefile):
+                            #games match, delete old copy#
+                            print("File correctly copied, removing source file...")
+                            os.remove(pathfile)
+
                     total_games += 1
                     print("DONE")
                     print("====================================\n")
